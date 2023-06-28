@@ -14,74 +14,85 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
 public class FXMLController {
-	
-	private Model model;
 
-    @FXML // ResourceBundle that was given to the FXMLLoader
+    private Model model;
+
+    @FXML
     private ResourceBundle resources;
 
-    @FXML // URL location of the FXML file that was given to the FXMLLoader
+    @FXML
     private URL location;
 
-    @FXML // fx:id="txtResult"
-    private TextArea txtResult; // Value injected by FXMLLoader
+    @FXML
+    private TextArea txtResult;
 
-    @FXML // fx:id="compagnieMinimo"
-    private TextField compagnieMinimo; // Value injected by FXMLLoader
+    @FXML
+    private TextField compagnieMinimo;
 
-    @FXML // fx:id="cmbBoxAeroportoPartenza"
-    private ComboBox<Airport> cmbBoxAeroportoPartenza; // Value injected by FXMLLoader
+    @FXML
+    private ComboBox<Airport> cmbBoxAeroportoPartenza;
 
-    @FXML // fx:id="cmbBoxAeroportoDestinazione"
-    private ComboBox<Airport> cmbBoxAeroportoDestinazione; // Value injected by FXMLLoader
+    @FXML
+    private ComboBox<Airport> cmbBoxAeroportoDestinazione;
 
-    @FXML // fx:id="btnAnalizza"
-    private Button btnAnalizza; // Value injected by FXMLLoader
+    @FXML
+    private Button btnAnalizza;
 
-    @FXML // fx:id="btnConnessione"
-    private Button btnConnessione; // Value injected by FXMLLoader
+    @FXML
+    private Button btnConnessione;
 
     @FXML
     void doAnalizzaAeroporti(ActionEvent event) {
-    	txtResult.clear();
-    	
-    	int x;
-    	
-    	try {
-    		x = Integer.parseInt(compagnieMinimo.getText());
-    	} catch (NumberFormatException e) {
-    		txtResult.appendText("Inserire valore numerico");
-    		return;
-    	}
-    	
-    	this.model.creaGrafo(x);
-    	
-    	txtResult.appendText("# VERTICI: " + this.model.nVertici() + "\n");
-    	txtResult.appendText("# ARCHI: " + this.model.nArchi());
-    	
-    	cmbBoxAeroportoPartenza.getItems().addAll(this.model.getVertici());
-    	cmbBoxAeroportoDestinazione.getItems().addAll(this.model.getVertici());
+        txtResult.clear();
+
+        int x;
+
+        try {
+            x = Integer.parseInt(compagnieMinimo.getText());
+
+        } catch (NumberFormatException e) {
+            txtResult.setText("Inserisci un numero di recensioni");
+            return;
+        }
+
+        this.model.creaGrafo(x);
+
+        txtResult.appendText("GRAFO CREATO!\n");
+        txtResult.appendText("# VERTICI: " + model.getNVertici() + "\n");
+        txtResult.appendText("# ARCHI: " + model.getNArchi() + "\n");
+        
+        cmbBoxAeroportoPartenza.getItems().addAll(model.getVertici());
+        cmbBoxAeroportoDestinazione.getItems().addAll(model.getVertici());
+
     }
 
     @FXML
     void doTestConnessione(ActionEvent event) {
     	txtResult.clear();
-    	if(cmbBoxAeroportoPartenza.getValue() == null ||
-    			cmbBoxAeroportoDestinazione.getValue() == null) {
-    		txtResult.appendText("Seleziona i due aeroporti!");
-    		return ;
+    	Airport a1 = cmbBoxAeroportoPartenza.getValue();
+    	if(a1 == null) {
+    		txtResult.setText("Seleziona un aeroporto di partenza");
+    		return;
     	}
     	
-    	List<Airport> percorso = this.model.getPercorso(cmbBoxAeroportoPartenza.getValue(), cmbBoxAeroportoDestinazione.getValue());
+    	Airport a2 = cmbBoxAeroportoDestinazione.getValue();
+    	if(a2 == null) {
+    		txtResult.setText("Seleziona un aeroporto di destinazione");
+    		return;
+    	}
+    	
+    	List<Airport> percorso = model.getPercorso(a1, a2);
     	
     	if(percorso == null) {
-    		txtResult.appendText("I due aeroporti non sono collegati");
-    	} else {
+    		txtResult.setText("I due nodi non sono collegati");
+    	} else{
+    		txtResult.appendText(a1 + " e " + a2 + " sono collegati dal seguente percorso:\n\n");
     		txtResult.appendText(percorso.toString());
     	}
+
     }
 
-    @FXML // This method is called by the FXMLLoader when initialization is complete
+    @FXML
     void initialize() {
         assert txtResult != null : "fx:id=\"txtResult\" was not injected: check your FXML file 'Scene.fxml'.";
         assert compagnieMinimo != null : "fx:id=\"compagnieMinimo\" was not injected: check your FXML file 'Scene.fxml'.";
@@ -91,8 +102,9 @@ public class FXMLController {
         assert btnConnessione != null : "fx:id=\"btnConnessione\" was not injected: check your FXML file 'Scene.fxml'.";
 
     }
-    
+
     public void setModel(Model model) {
-    	this.model = model;
+        this.model = model;
+   
     }
 }
